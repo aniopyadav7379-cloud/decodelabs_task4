@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interns Directory · DecodeLabs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">DL</span>
+      <div class="brand-text">
+        <h1>Interns Directory</h1>
+        <p>DecodeLabs · Project 4 — Frontend &amp; Backend Integration</p>
+      </div>
+    </div>
+    <div class="api-status" id="apiStatus" data-state="checking">
+      <span class="status-dot"></span>
+      <span class="status-label">Checking API…</span>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <section class="toolbar">
+      <div class="toolbar-left">
+        <label for="departmentFilter" class="visually-hidden">Filter by department</label>
+        <select id="departmentFilter">
+          <option value="">All departments</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Design">Design</option>
+          <option value="Product">Product</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Operations">Operations</option>
+        </select>
+        <button id="refreshBtn" class="btn btn-ghost" type="button">Refresh</button>
+      </div>
+      <button id="addInternBtn" class="btn btn-primary" type="button">+ Add Intern</button>
+    </section>
+
+    <section id="errorBanner" class="error-banner" hidden>
+      <span id="errorBannerText"></span>
+      <button id="errorBannerRetry" class="btn btn-ghost btn-sm" type="button">Retry</button>
+    </section>
+
+    <section id="internGrid" class="intern-grid" aria-live="polite">
+      <!-- Cards / skeletons / empty-state injected by js/ui.js -->
+    </section>
+
+  </main>
+
+  <!-- Slide-in drawer for Add / Edit -->
+  <div id="drawerOverlay" class="drawer-overlay" hidden></div>
+  <aside id="internDrawer" class="drawer" aria-hidden="true">
+    <form id="internForm" novalidate>
+      <div class="drawer-header">
+        <h2 id="drawerTitle">Add Intern</h2>
+        <button type="button" id="drawerClose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+
+      <input type="hidden" id="internId" />
+
+      <label class="field">
+        <span>Full name</span>
+        <input type="text" id="internName" name="name" placeholder="e.g. Sam Chen" required />
+        <small class="field-error" id="errName"></small>
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" id="internEmail" name="email" placeholder="sam.chen@decodelabs.tech" required />
+        <small class="field-error" id="errEmail"></small>
+      </label>
+
+      <label class="field">
+        <span>Role</span>
+        <input type="text" id="internRole" name="role" placeholder="e.g. Frontend Intern" required />
+        <small class="field-error" id="errRole"></small>
+      </label>
+
+      <label class="field">
+        <span>Department</span>
+        <select id="internDepartment" name="department" required>
+          <option value="">Select a department</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Design">Design</option>
+          <option value="Product">Product</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Operations">Operations</option>
+        </select>
+        <small class="field-error" id="errDepartment"></small>
+      </label>
+
+      <div class="drawer-actions">
+        <button type="button" id="drawerCancel" class="btn btn-ghost">Cancel</button>
+        <button type="submit" id="drawerSubmit" class="btn btn-primary">
+          <span class="btn-label">Save intern</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </div>
+    </form>
+  </aside>
+
+  <!-- Signature element: a live network console mirroring real request/response traffic -->
+  <div class="network-console" id="networkConsole">
+    <div class="console-header">
+      <span>Network Console</span>
+      <button id="consoleToggle" class="icon-btn" aria-label="Collapse console">▾</button>
+    </div>
+    <div class="console-body" id="consoleBody"></div>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="assertive"></div>
+
+  <!-- Deployment: uncomment and point this at your deployed API before
+       hosting this folder anywhere other than localhost.
+  <script>window.__API_BASE_URL__ = "https://your-api.example.com/api";</script>
+  -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

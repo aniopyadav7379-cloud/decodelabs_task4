@@ -1,0 +1,375 @@
+/* ============================================================
+   DESIGN TOKENS
+   Palette nods to the training deck's sage/forest identity,
+   reworked for a real internal tool: quiet surfaces, one
+   confident accent, mono type reserved for system/data readouts.
+   ============================================================ */
+:root {
+  --bg: #F6F8F4;
+  --surface: #FFFFFF;
+  --surface-sunken: #EEF2EA;
+  --border: #DDE3D8;
+
+  --ink: #1F2A22;
+  --ink-muted: #5B6B5E;
+
+  --accent: #3D6B52;       /* forest green — primary actions */
+  --accent-hover: #305741;
+  --accent-soft: #E3EDE6;
+
+  --warn: #C46A3D;         /* warm clay — errors / destructive */
+  --warn-soft: #FBEAE0;
+
+  --success: #2F8558;
+  --amber: #B8860B;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 2px rgba(31,42,34,0.06), 0 8px 24px rgba(31,42,34,0.06);
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
+}
+
+/* ============================== TOPBAR ============================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.brand-text p {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.api-status {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-muted);
+}
+
+.api-status[data-state="online"] .status-dot { background: var(--success); }
+.api-status[data-state="offline"] .status-dot { background: var(--warn); }
+.api-status[data-state="checking"] .status-dot { animation: pulse 1.2s infinite ease-in-out; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ============================== PAGE / TOOLBAR ============================== */
+.page { max-width: 1080px; margin: 0 auto; padding: 28px 32px 120px; }
+
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+}
+
+.toolbar-left { display: flex; gap: 10px; align-items: center; }
+
+select, input[type="text"], input[type="email"] {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+select:focus, input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ============================== BUTTONS ============================== */
+.btn {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  padding: 9px 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+}
+.btn:active { transform: scale(0.98); }
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface-sunken); }
+
+.btn-sm { padding: 6px 10px; font-size: 0.8rem; }
+
+.btn-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.icon-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 1rem; color: var(--ink-muted); line-height: 1;
+  padding: 4px;
+}
+.icon-btn:hover { color: var(--ink); }
+
+/* ============================== ERROR BANNER ============================== */
+.error-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--warn-soft);
+  border: 1px solid var(--warn);
+  color: #8A4526;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 18px;
+  font-size: 0.88rem;
+}
+
+/* ============================== INTERN GRID / CARDS ============================== */
+.intern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.intern-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intern-card[data-dept="Design"] { border-left-color: #7C6FB0; }
+.intern-card[data-dept="Product"] { border-left-color: #3D7EB0; }
+.intern-card[data-dept="Marketing"] { border-left-color: #B0793D; }
+.intern-card[data-dept="Operations"] { border-left-color: #6E7A6E; }
+
+.intern-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+}
+
+.intern-card .role { color: var(--ink-muted); font-size: 0.85rem; }
+
+.intern-card .email {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  word-break: break-all;
+}
+
+.dept-pill {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+
+.card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+
+.card-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+/* Skeleton loading state */
+.skeleton-card {
+  height: 132px;
+  border-radius: var(--radius);
+  background: linear-gradient(100deg, var(--surface-sunken) 30%, #fff 50%, var(--surface-sunken) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+  border: 1px solid var(--border);
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-muted);
+}
+.empty-state strong { display: block; color: var(--ink); font-family: var(--font-display); margin-bottom: 6px; }
+
+/* ============================== DRAWER ============================== */
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(31,42,34,0.35);
+  z-index: 40;
+}
+
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(400px, 92vw);
+  background: var(--surface);
+  box-shadow: -12px 0 30px rgba(31,42,34,0.15);
+  z-index: 50;
+  padding: 22px;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+}
+.drawer.open { transform: translateX(0); }
+
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.drawer-header h2 { font-family: var(--font-display); margin: 0; font-size: 1.1rem; }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; font-size: 0.85rem; }
+.field span { font-weight: 600; }
+.field input, .field select { width: 100%; }
+.field-error { color: var(--warn); font-size: 0.76rem; min-height: 14px; }
+
+.drawer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+
+/* ============================== NETWORK CONSOLE (signature element) ============================== */
+.network-console {
+  position: fixed;
+  bottom: 0; right: 24px;
+  width: 360px;
+  max-height: 220px;
+  background: #14201A;
+  color: #D8E6DC;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 -6px 24px rgba(0,0,0,0.25);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  z-index: 60;
+  transition: max-height 0.2s ease;
+}
+.network-console.collapsed { max-height: 34px; }
+.network-console.collapsed .console-body { display: none; }
+
+.console-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px;
+  color: #9FB6A6;
+  letter-spacing: 0.03em;
+}
+.console-header .icon-btn { color: #9FB6A6; }
+
+.console-body {
+  padding: 0 12px 10px;
+  overflow-y: auto;
+  max-height: 186px;
+}
+
+.console-line { padding: 2px 0; white-space: pre-wrap; word-break: break-word; }
+.console-line.status-2xx { color: #7CD9A5; }
+.console-line.status-4xx { color: #E8B563; }
+.console-line.status-5xx { color: #E88C7D; }
+.console-line.status-pending { color: #7FA0EE; }
+
+/* ============================== TOASTS ============================== */
+.toast-stack {
+  position: fixed;
+  top: 20px; right: 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 70;
+}
+
+.toast {
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+  min-width: 220px;
+  animation: toast-in 0.2s ease;
+  border-left: 4px solid var(--success);
+}
+.toast.toast-error { border-left-color: var(--warn); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================== RESPONSIVE ============================== */
+@media (max-width: 640px) {
+  .topbar { padding: 14px 16px; }
+  .page { padding: 20px 16px 140px; }
+  .network-console { right: 12px; left: 12px; width: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "interns-directory-backend",
+  "version": "1.0.0",
+  "description": "Project 4 — Frontend & Backend Integration | DecodeLabs Full Stack Training Kit",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["rest-api", "express", "decodelabs", "project4"],
+  "author": "DecodeLabs",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
