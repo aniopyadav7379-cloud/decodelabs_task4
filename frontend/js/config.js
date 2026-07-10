@@ -8,7 +8,7 @@
  *
  * Override at deploy time in one of two ways:
  *   1. Edit API_BASE_URL below before deploying this static site, or
- *   2. Set window.__API_BASE_URL__ = "https://decodelabs-task4.onrender.com/api";
+ *   2. Set window.__API_BASE_URL__ = "https://your-api.example.com/api"
  *      in a small inline <script> in index.html (useful if the same
  *      build is deployed to multiple environments).
  */
