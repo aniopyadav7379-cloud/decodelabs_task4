@@ -6,10 +6,19 @@ const morgan = require("morgan");
 
 const corsOptions = require("./config/corsConfig");
 const internsRoutes = require("./routes/internsRoutes");
+const authRoutes = require("./routes/authRoutes");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+if (!process.env.JWT_SECRET) {
+  console.error(
+    "❌ JWT_SECRET is not set. Copy .env.example to .env (or set it in your host's " +
+      "environment variables) before starting the server — auth will fail without it."
+  );
+  process.exit(1);
+}
 
 // Deployment fix: most PaaS providers (Render, Railway, Fly.io) sit behind
 // a reverse proxy. Without this, req.secure/req.ip and rate-limiting logic
@@ -27,6 +36,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // ---- Resource routes ----------------------------------------------------
+app.use("/api/auth", authRoutes);
 app.use("/api/interns", internsRoutes);
 
 // ---- 404 + centralized error handling (must be registered last) -------

@@ -1,5 +1,6 @@
 const store = require("../data/internsStore");
 const AppError = require("../utils/AppError");
+const { toCsv } = require("../utils/csv");
 const {
   validateInternCreate,
   validateInternReplace,
@@ -44,18 +45,16 @@ function assertEmailNotTaken(email, excludeId) {
  */
 
 // GET /api/interns  -> 200
+// Supports ?department=, ?search=, ?sort=name|department|joinedOn|role,
+// ?order=asc|desc, ?page=, ?limit= — the same query the export endpoint
+// below reuses, so what's on screen always matches what gets exported.
 async function listInterns(req, res, next) {
   try {
-    const { department } = req.query;
-    let data = store.getAll();
+    const { department, search, sort, order, page, limit } = req.query;
+    const filtered = store.queryAll({ department, search, sort, order });
+    const { data, pagination } = store.paginate(filtered, page, limit || process.env.DEFAULT_PAGE_SIZE);
 
-    if (department) {
-      data = data.filter(
-        (intern) => intern.department.toLowerCase() === department.toLowerCase()
-      );
-    }
-
-    res.status(200).json({ success: true, count: data.length, data });
+    res.status(200).json({ success: true, data, pagination });
   } catch (err) {
     next(err);
   }
@@ -143,6 +142,47 @@ async function deleteIntern(req, res, next) {
   }
 }
 
+// POST /api/interns/bulk-delete  { ids: [1,2,3] }  -> 200 | 422
+async function bulkDeleteInterns(req, res, next) {
+  try {
+    const { ids } = req.body || {};
+    if (!Array.isArray(ids) || ids.length === 0 || !ids.every(Number.isInteger)) {
+      throw new AppError("ids must be a non-empty array of integers.", 422, "VALIDATION_ERROR");
+    }
+    const removedIds = store.removeMany(ids);
+    res.status(200).json({ success: true, data: { removedIds, requested: ids.length } });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// GET /api/interns/export?format=csv|json — mirrors the current list query,
+// minus pagination, so the export always matches what's filtered on screen.
+async function exportInterns(req, res, next) {
+  try {
+    const { department, search, sort, order, format = "csv" } = req.query;
+    const data = store.queryAll({ department, search, sort, order });
+    const columns = ["id", "name", "email", "role", "department", "joinedOn", "phone", "manager", "linkedin", "notes"];
+
+    if (format === "json") {
+      res.setHeader("Content-Disposition", 'attachment; filename="interns.json"');
+      res.status(200).json({ success: true, data });
+      return;
+    }
+
+    if (format !== "csv") {
+      throw new AppError('format must be "csv" or "json".', 422, "VALIDATION_ERROR");
+    }
+
+    const csv = toCsv(data, columns);
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", 'attachment; filename="interns.csv"');
+    res.status(200).send(csv);
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   listInterns,
   getIntern,
@@ -150,4 +190,6 @@ module.exports = {
   replaceIntern,
   patchIntern,
   deleteIntern,
+  bulkDeleteInterns,
+  exportInterns,
 };

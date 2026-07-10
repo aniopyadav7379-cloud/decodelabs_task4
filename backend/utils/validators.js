@@ -1,6 +1,7 @@
 const AppError = require("./AppError");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const LINKEDIN_REGEX = /^https?:\/\/([\w-]+\.)?linkedin\.com\/.*$/i;
 const ALLOWED_DEPARTMENTS = [
   "Engineering",
   "Design",
@@ -8,6 +9,28 @@ const ALLOWED_DEPARTMENTS = [
   "Marketing",
   "Operations",
 ];
+
+/**
+ * All extended profile fields are optional everywhere, but if present
+ * they must still be well-formed. Shared by create/replace/patch so the
+ * same rules apply regardless of verb.
+ */
+function validateExtras(payload, errors) {
+  const { phone, manager, linkedin, notes } = payload;
+
+  if (phone !== undefined && String(phone).length > 30) {
+    errors.push("phone must be 30 characters or fewer.");
+  }
+  if (manager !== undefined && String(manager).length > 80) {
+    errors.push("manager must be 80 characters or fewer.");
+  }
+  if (linkedin !== undefined && linkedin !== "" && !LINKEDIN_REGEX.test(linkedin)) {
+    errors.push("linkedin must be a valid linkedin.com URL (or left blank).");
+  }
+  if (notes !== undefined && String(notes).length > 500) {
+    errors.push("notes must be 500 characters or fewer.");
+  }
+}
 
 /**
  * Validates a payload for CREATE (POST). All fields required.
@@ -30,6 +53,7 @@ function validateInternCreate(payload = {}) {
   if (!department || !ALLOWED_DEPARTMENTS.includes(department)) {
     errors.push(`department must be one of: ${ALLOWED_DEPARTMENTS.join(", ")}.`);
   }
+  validateExtras(payload, errors);
 
   if (errors.length) {
     throw new AppError(errors.join(" "), 422, "VALIDATION_ERROR");
@@ -49,33 +73,36 @@ function validateInternReplace(payload) {
  * recognized, well-formed field must be present.
  */
 function validateInternPatch(payload = {}) {
-  const { name, email, role, department } = payload;
-  const hasAnyField = [name, email, role, department].some(
+  const { name, email, role, department, phone, manager, linkedin, notes } = payload;
+  const hasAnyField = [name, email, role, department, phone, manager, linkedin, notes].some(
     (v) => v !== undefined
   );
 
   if (!hasAnyField) {
     throw new AppError(
-      "At least one field (name, email, role, department) must be provided.",
+      "At least one field must be provided.",
       422,
       "VALIDATION_ERROR"
     );
   }
+
+  const errors = [];
   if (email !== undefined && !EMAIL_REGEX.test(email)) {
-    throw new AppError("email must be a valid email address.", 422, "VALIDATION_ERROR");
+    errors.push("email must be a valid email address.");
   }
   if (department !== undefined && !ALLOWED_DEPARTMENTS.includes(department)) {
-    throw new AppError(
-      `department must be one of: ${ALLOWED_DEPARTMENTS.join(", ")}.`,
-      422,
-      "VALIDATION_ERROR"
-    );
+    errors.push(`department must be one of: ${ALLOWED_DEPARTMENTS.join(", ")}.`);
   }
   if (name !== undefined && (typeof name !== "string" || name.trim().length < 2)) {
-    throw new AppError("name must be a string of at least 2 characters.", 422, "VALIDATION_ERROR");
+    errors.push("name must be a string of at least 2 characters.");
   }
   if (role !== undefined && (typeof role !== "string" || role.trim().length < 2)) {
-    throw new AppError("role must be a string of at least 2 characters.", 422, "VALIDATION_ERROR");
+    errors.push("role must be a string of at least 2 characters.");
+  }
+  validateExtras(payload, errors);
+
+  if (errors.length) {
+    throw new AppError(errors.join(" "), 422, "VALIDATION_ERROR");
   }
 }
 

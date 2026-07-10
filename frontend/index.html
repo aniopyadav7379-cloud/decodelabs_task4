@@ -18,9 +18,17 @@
         <p>DecodeLabs · Project 4 — Frontend &amp; Backend Integration</p>
       </div>
     </div>
-    <div class="api-status" id="apiStatus" data-state="checking">
-      <span class="status-dot"></span>
-      <span class="status-label">Checking API…</span>
+    <div class="topbar-right">
+      <div class="api-status" id="apiStatus" data-state="checking">
+        <span class="status-dot"></span>
+        <span class="status-label">Checking API…</span>
+      </div>
+      <button id="themeToggle" class="icon-btn theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+      <button id="loginBtn" class="btn btn-ghost btn-sm" type="button">Log in</button>
+      <div id="userMenu" class="user-menu" hidden>
+        <span id="usernameLabel" class="username-label"></span>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>
+      </div>
     </div>
   </header>
 
@@ -28,6 +36,9 @@
 
     <section class="toolbar">
       <div class="toolbar-left">
+        <label for="searchInput" class="visually-hidden">Search interns</label>
+        <input type="search" id="searchInput" placeholder="Search name, email, role…" />
+
         <label for="departmentFilter" class="visually-hidden">Filter by department</label>
         <select id="departmentFilter">
           <option value="">All departments</option>
@@ -37,9 +48,33 @@
           <option value="Marketing">Marketing</option>
           <option value="Operations">Operations</option>
         </select>
+
+        <label for="sortField" class="visually-hidden">Sort by</label>
+        <select id="sortField">
+          <option value="joinedOn">Sort: Joined date</option>
+          <option value="name">Sort: Name</option>
+          <option value="department">Sort: Department</option>
+          <option value="role">Sort: Role</option>
+        </select>
+        <button id="sortOrderBtn" class="btn btn-ghost btn-sm" type="button" title="Toggle ascending/descending">↓ Desc</button>
+
         <button id="refreshBtn" class="btn btn-ghost" type="button">Refresh</button>
       </div>
-      <button id="addInternBtn" class="btn btn-primary" type="button">+ Add Intern</button>
+      <div class="toolbar-right">
+        <div class="export-group">
+          <a id="exportCsvBtn" class="btn btn-ghost btn-sm" href="#" download>Export CSV</a>
+          <a id="exportJsonBtn" class="btn btn-ghost btn-sm" href="#" download>Export JSON</a>
+        </div>
+        <button id="addInternBtn" class="btn btn-primary" type="button" hidden>+ Add Intern</button>
+      </div>
+    </section>
+
+    <section id="bulkToolbar" class="bulk-toolbar" hidden>
+      <label class="bulk-select-all">
+        <input type="checkbox" id="selectAllCheckbox" />
+        <span id="selectedCountLabel">0 selected</span>
+      </label>
+      <button id="bulkDeleteBtn" class="btn btn-ghost btn-sm bulk-delete-btn" type="button">Delete selected</button>
     </section>
 
     <section id="errorBanner" class="error-banner" hidden>
@@ -50,6 +85,8 @@
     <section id="internGrid" class="intern-grid" aria-live="polite">
       <!-- Cards / skeletons / empty-state injected by js/ui.js -->
     </section>
+
+    <nav id="pagination" class="pagination" aria-label="Pagination"></nav>
 
   </main>
 
@@ -95,6 +132,34 @@
         <small class="field-error" id="errDepartment"></small>
       </label>
 
+      <details class="advanced-fields">
+        <summary>Additional profile details (optional)</summary>
+
+        <label class="field">
+          <span>Phone</span>
+          <input type="text" id="internPhone" name="phone" placeholder="+1 415 555 0132" />
+          <small class="field-error" id="errPhone"></small>
+        </label>
+
+        <label class="field">
+          <span>Manager</span>
+          <input type="text" id="internManager" name="manager" placeholder="e.g. Sam Okafor" />
+          <small class="field-error" id="errManager"></small>
+        </label>
+
+        <label class="field">
+          <span>LinkedIn</span>
+          <input type="text" id="internLinkedin" name="linkedin" placeholder="https://linkedin.com/in/…" />
+          <small class="field-error" id="errLinkedin"></small>
+        </label>
+
+        <label class="field">
+          <span>Notes</span>
+          <textarea id="internNotes" name="notes" rows="3" placeholder="What are they working on?"></textarea>
+          <small class="field-error" id="errNotes"></small>
+        </label>
+      </details>
+
       <div class="drawer-actions">
         <button type="button" id="drawerCancel" class="btn btn-ghost">Cancel</button>
         <button type="submit" id="drawerSubmit" class="btn btn-primary">
@@ -104,6 +169,47 @@
       </div>
     </form>
   </aside>
+
+  <!-- Read-only profile drawer -->
+  <div id="profileOverlay" class="drawer-overlay" hidden></div>
+  <aside id="profileDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <h2>Intern Profile</h2>
+      <button type="button" id="profileClose" class="icon-btn" aria-label="Close">✕</button>
+    </div>
+    <div id="profileBody" class="profile-body"></div>
+    <div class="drawer-actions" id="profileActions"></div>
+  </aside>
+
+  <!-- Login modal -->
+  <div id="loginOverlay" class="drawer-overlay" hidden></div>
+  <div id="loginModal" class="login-modal" hidden role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <form id="loginForm" novalidate>
+      <div class="drawer-header">
+        <h2 id="loginTitle">Log in</h2>
+        <button type="button" id="loginClose" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <p class="login-hint">Log in to add, edit, or delete interns. Browsing stays open to everyone.</p>
+
+      <label class="field">
+        <span>Username</span>
+        <input type="text" id="loginUsername" autocomplete="username" required />
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" id="loginPassword" autocomplete="current-password" required />
+      </label>
+      <small class="field-error" id="loginError"></small>
+
+      <div class="drawer-actions">
+        <button type="button" id="loginCancel" class="btn btn-ghost">Cancel</button>
+        <button type="submit" id="loginSubmit" class="btn btn-primary">
+          <span class="btn-label">Log in</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </div>
+    </form>
+  </div>
 
   <!-- Signature element: a live network console mirroring real request/response traffic -->
   <div class="network-console" id="networkConsole">

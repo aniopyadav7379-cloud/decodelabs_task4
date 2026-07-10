@@ -32,6 +32,32 @@
   --font-mono: "IBM Plex Mono", monospace;
 }
 
+/* Dark mode — same token names, swapped values, so every component
+   that already uses var(--...) picks this up with zero extra rules. */
+:root[data-theme="dark"] {
+  --bg: #12180F;
+  --surface: #1B231A;
+  --surface-sunken: #232C21;
+  --border: #2E3A2B;
+
+  --ink: #E7EFE3;
+  --ink-muted: #93A491;
+
+  --accent: #5FA980;
+  --accent-hover: #7AC29B;
+  --accent-soft: #23362B;
+
+  --warn: #E08A5B;
+  --warn-soft: #3A241A;
+
+  --success: #5FCB8F;
+  --amber: #D9A93B;
+
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+}
+
+body { transition: background-color 0.15s ease, color 0.15s ease; }
+
 * { box-sizing: border-box; }
 
 body {
@@ -55,6 +81,8 @@ body {
   padding: 18px 32px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .brand { display: flex; align-items: center; gap: 14px; }
@@ -346,7 +374,7 @@ select:focus, input:focus {
 }
 
 .toast {
-  background: var(--ink);
+  background: #14201A;
   color: #fff;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
@@ -361,6 +389,134 @@ select:focus, input:focus {
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================== TOPBAR EXTRAS (auth / theme) ============================== */
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.theme-toggle { font-size: 1.1rem; }
+
+.user-menu { display: flex; align-items: center; gap: 10px; }
+
+.username-label {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+}
+
+/* ============================== SEARCH / SORT CONTROLS ============================== */
+#searchInput {
+  min-width: 220px;
+}
+
+.toolbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.export-group { display: flex; gap: 8px; }
+
+/* ============================== BULK TOOLBAR ============================== */
+.bulk-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--accent-hover);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+}
+
+.bulk-select-all { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.bulk-delete-btn { border-color: var(--warn); color: #8A4526; }
+
+/* ============================== CARD HEADER / CHECKBOX / NAME LINK ============================== */
+.card-header-row { display: flex; align-items: center; gap: 8px; }
+
+.card-checkbox { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+
+.intern-name-link {
+  background: none; border: none; padding: 0; margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+.intern-name-link:hover { color: var(--accent); text-decoration: underline; }
+
+/* ============================== PAGINATION ============================== */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+.pagination-label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+/* ============================== ADVANCED FIELDS (details/summary) ============================== */
+.advanced-fields {
+  margin: 6px 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+.advanced-fields summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.advanced-fields[open] summary { margin-bottom: 10px; }
+
+.field textarea {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  resize: vertical;
+}
+
+/* ============================== PROFILE DRAWER (read-only) ============================== */
+.profile-body { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
+
+.profile-row { display: flex; flex-direction: column; gap: 2px; }
+.profile-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.profile-value {
+  font-size: 0.92rem;
+  word-break: break-word;
+}
+
+/* ============================== LOGIN MODAL ============================== */
+.login-modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, 92vw);
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  z-index: 80;
+  padding: 22px;
+}
+
+.login-hint {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  margin-top: 0;
 }
 
 /* ============================== RESPONSIVE ============================== */
